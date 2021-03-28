@@ -56,7 +56,8 @@ provided for accurate variance estimation given the *Canadian Health
 Measures Survey* complex survey design. The description of variables is
 presented on the Figure 1.
 
-![Description of the variables.](./1.png)
+![Description of the
+variables.](./Case_study_1_report_with_code_files/figure-gfm/1-1.png)
 
 Thus, the dataset includes only 3 categorical variables. The *“HIGHBP”*
 is a target variable in this study, and it contains 2 categories: “yes”
@@ -211,80 +212,33 @@ Then, the imputation of missing values are simulated in 3 steps:
 
 <!-- end list -->
 
-``` r
-# Define an Error matrix
-errors = matrix(0, ncol=length(missing_vars), nrow=3)
-
-mi_imputation = function(df_check_mi) {
-    # This function imputes the missing values using Multiple imputations
-    # from the mi package
-    
-    # Define the Missing Data Frame
-    mdf = missing_data.frame(df_check_mi)
-    
-    # Change the method to Predictive Mean Matching
-    mdf = change(mdf, y=missing_vars, what="method", to="pmm")
-    
-    # Impute missing values with  1 chain and 30 iterations
-    imputations = mi(mdf, n.iter=30, n.chains=1, max.minutes=15, verbose=FALSE)
-    
-    # Get the imputed data
-    imputed_df = complete(imputations)
-    imputed_df = imputed_df[, main_vars]
-    return(imputed_df)
-}
-
-
-
-for (k in 1:N_SIM) {
-    # Initialize store lists
-    df_check_cur = data.frame(df_check)
-    imputed_dfs = list()
-    inds = list()
-    
-    # Generate missing values
-    inds[[1]] = sample(1:nrow(df_check), sort_nan_cols["HWMDBMI"])
-    inds[[2]] = sample(1:nrow(df_check), sort_nan_cols["LAB_BHG"])
-    inds[[3]] = sample(1:nrow(df_check), sort_nan_cols["LAB_BCD"])
-    inds[[4]] = sample(1:nrow(df_check), sort_nan_cols["SMK_12"])
-    
-    df_check_cur[inds[[1]], "HWMDBMI"] = NA
-    df_check_cur[inds[[2]], "LAB_BHG"] = NA
-    df_check_cur[inds[[3]], "LAB_BCD"] = NA
-    df_check_cur[inds[[4]], "SMK_12"] = NA
-    
-    # Impute missing values using 3 methods
-    imputed_dfs[[1]] = mi_imputation(df_check_cur)
-    imputed_dfs[[2]] = missForest(df_check_cur, maxiter=10, ntree=100, verbose=FALSE)$ximp
-    imputed_dfs[[3]] = kNN(df_check_cur, k=3)
-    
-    # Calculate the errors for each column
-    for (i in 1:3) {
-        for (j in 1:length(missing_vars)) {
-            cur_imp_df = imputed_dfs[[i]]
-            cur_col = missing_vars[j]
-            cur_rows = inds[[j]]
-            
-            if (cur_col == "SMK_12") {
-                # Calculate Accuracy
-                cur_error = (cur_imp_df[cur_rows, cur_col] == df_check[cur_rows, cur_col])
-                errors[i, j] = errors[i, j] + cur_error
-            } else {
-                # Calculate MAPE
-                cur_MAPE = MAPE(cur_imp_df[cur_rows, cur_col], df_check[cur_rows, cur_col])
-                errors[i, j] = errors[i, j] + cur_MAPE
-            }
-        }
-    }
-}
-```
-
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 6 in progress...done!
+    ##   missForest iteration 7 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
@@ -298,14 +252,58 @@ for (k in 1:N_SIM) {
     ##   missForest iteration 3 in progress...done!
     ##   missForest iteration 4 in progress...done!
     ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ## NOTE: In the following pairs of variables, the missingness pattern of the second is a subset of the first.
+    ##  Please verify whether they are in fact logically distinct variables.
+    ##      [,1]      [,2]    
+    ## [1,] "LAB_BHG" "SMK_12"
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
     ##   missForest iteration 4 in progress...done!
     ##   missForest iteration 5 in progress...done!
     ##   missForest iteration 6 in progress...done!
-    ##   missForest iteration 7 in progress...done!
-    ##   missForest iteration 8 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
@@ -318,58 +316,6 @@ for (k in 1:N_SIM) {
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 5 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
@@ -393,9 +339,9 @@ errors_df
 ```
 
     ##              HWMDBMI  LAB_BHG  LAB_BCD SMK_12
-    ## MI         0.2933629 1.833367 3.036999   0.68
-    ## MissForest 0.2183870 1.575102 2.793391   0.76
-    ## KNN        0.2437377 1.528932 2.821768   0.80
+    ## MI         0.2864065 1.762134 2.907505   0.52
+    ## MissForest 0.2167524 1.528450 2.581706   0.64
+    ## KNN        0.2353935 1.432792 2.633198   0.64
 
 The accuracy of predictions is satisfactory only for the *‘HWMDBMI’*
 column. However, all imputation method shows very low precision for the
@@ -604,7 +550,8 @@ summary(model_1)
 
 Sex, age, body mass index and blood mercury value are statistically
 significant in this model. Other parameters does not change with change
-in target variable.
+in target variable. All significant factors have a positive impact on
+the model decision (positive coefficients).
 
 ### Models with survey information
 
@@ -613,8 +560,7 @@ survey design should be specified. In this model comparison, the *Survey
 weight* is taken as additional survey information. Survey weight
 indicates the represented population by the individual. The survey
 design consists of only one sampling stage. After the survey design is
-specified, the GLM model is applied to the dataset. The R output is
-shown in the Figure 14.
+specified, the GLM model is applied to the dataset.
 
 ``` r
 # Define a survey design:
@@ -710,6 +656,169 @@ summary(model_2, df.resid=11)
 The Body mass index shows a lower impact in model with 11 degrees of
 freedom.
 
+## Exploring sex factor
+
+This section explores whether the risk factors vary between men and
+women. Models in this section consider interactions between Sex factor
+and Age, Body mass index and Blood counts.
+
+### Models without survey information
+
+The third model has the same formula as in the first model, but with
+additional interaction coefficients.
+
+``` r
+# Define a simple model:
+# 1. Set the formula that includes all variables and interactions.
+# 2. Determine the data.
+# 3. Set the binomial distribution, logit link function by default.
+
+model_3 = glm(HIGHBP~SMK_12+CLC_SEX+CLC_AGE+HWMDBMI+LAB_BCD+LAB_BHG+CLC_SEX:CLC_AGE+CLC_SEX:HWMDBMI+CLC_SEX:LAB_BCD+CLC_SEX:LAB_BHG, 
+              data=df,                                                           
+              family="binomial")                                                 
+
+summary(model_3)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = HIGHBP ~ SMK_12 + CLC_SEX + CLC_AGE + HWMDBMI + 
+    ##     LAB_BCD + LAB_BHG + CLC_SEX:CLC_AGE + CLC_SEX:HWMDBMI + CLC_SEX:LAB_BCD + 
+    ##     CLC_SEX:LAB_BHG, family = "binomial", data = df)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -2.1863  -0.9871   0.6046   0.9628   2.0660  
+    ## 
+    ## Coefficients:
+    ##                      Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)         -3.834884   0.332302 -11.540  < 2e-16 ***
+    ## SMK_12non-smoker     0.019991   0.119245   0.168  0.86686    
+    ## SMK_12occasional    -0.331372   0.229006  -1.447  0.14790    
+    ## CLC_SEXmale          1.243339   0.437195   2.844  0.00446 ** 
+    ## CLC_AGE              0.052708   0.003681  14.321  < 2e-16 ***
+    ## HWMDBMI              0.034559   0.008224   4.202 2.65e-05 ***
+    ## LAB_BCD              0.006993   0.005446   1.284  0.19915    
+    ## LAB_BHG              0.005643   0.003162   1.785  0.07432 .  
+    ## CLC_SEXmale:CLC_AGE -0.006698   0.005094  -1.315  0.18859    
+    ## CLC_SEXmale:HWMDBMI -0.018747   0.011568  -1.621  0.10510    
+    ## CLC_SEXmale:LAB_BCD -0.005657   0.007589  -0.745  0.45602    
+    ## CLC_SEXmale:LAB_BHG -0.002684   0.004464  -0.601  0.54761    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 3998.1  on 2886  degrees of freedom
+    ## Residual deviance: 3501.5  on 2875  degrees of freedom
+    ## AIC: 3525.5
+    ## 
+    ## Number of Fisher Scoring iterations: 4
+
+As can be seen, the value of mercury in blood becomes less significant
+comparing to the first model. None of the intersection coefficients are
+significant in this model. Therefore, the risk factors do not vary
+across both sex groups.
+
+### Models with survey information
+
+A model with survey information that takes into account additional
+interactions is shown below. It uses the same survey design as the
+second model.
+
+``` r
+# Define a model with survey design
+# 1. Set the formula that includes all variables and interactions.
+# 2. Determine the design of the survey.
+# 3. Set the 'quasibinomial' distribution as proposed by tutorials to avoid warnings.
+
+model_4 = svyglm(HIGHBP~SMK_12+CLC_SEX+CLC_AGE+HWMDBMI+LAB_BCD+LAB_BHG+CLC_SEX:CLC_AGE+CLC_SEX:HWMDBMI+CLC_SEX:LAB_BCD+CLC_SEX:LAB_BHG, 
+                design=dsg,
+                family="quasibinomial")                                             
+
+summary(model_4)
+```
+
+    ## 
+    ## Call:
+    ## svyglm(formula = HIGHBP ~ SMK_12 + CLC_SEX + CLC_AGE + HWMDBMI + 
+    ##     LAB_BCD + LAB_BHG + CLC_SEX:CLC_AGE + CLC_SEX:HWMDBMI + CLC_SEX:LAB_BCD + 
+    ##     CLC_SEX:LAB_BHG, design = dsg, family = "quasibinomial")
+    ## 
+    ## Survey design:
+    ## svydesign(data = df, id = ~1, weights = ~WGT_FULL, variables = df[, 
+    ##     c("SMK_12", "CLC_SEX", "CLC_AGE", "HWMDBMI", "LAB_BCD", "LAB_BHG", 
+    ##         "HIGHBP")])
+    ## 
+    ## Coefficients:
+    ##                      Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)         -3.822851   0.392853  -9.731  < 2e-16 ***
+    ## SMK_12non-smoker     0.001457   0.142377   0.010 0.991833    
+    ## SMK_12occasional    -0.173236   0.282802  -0.613 0.540208    
+    ## CLC_SEXmale          1.401105   0.523751   2.675 0.007512 ** 
+    ## CLC_AGE              0.051165   0.004520  11.320  < 2e-16 ***
+    ## HWMDBMI              0.035531   0.009877   3.597 0.000327 ***
+    ## LAB_BCD              0.008614   0.006619   1.301 0.193262    
+    ## LAB_BHG              0.004657   0.003632   1.282 0.199935    
+    ## CLC_SEXmale:CLC_AGE -0.007122   0.006234  -1.142 0.253370    
+    ## CLC_SEXmale:HWMDBMI -0.022847   0.013933  -1.640 0.101155    
+    ## CLC_SEXmale:LAB_BCD -0.010532   0.009147  -1.151 0.249672    
+    ## CLC_SEXmale:LAB_BHG -0.001740   0.005287  -0.329 0.742065    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for quasibinomial family taken to be 1.007615)
+    ## 
+    ## Number of Fisher Scoring iterations: 4
+
+The value of mercury in blood becomes even less significant. None of the
+intersection coefficients are significant in this model too. The model
+with 11 degrees of freedom is shown below.
+
+``` r
+# Get the summary for 11 degrees of freedom
+summary(model_4, df.resid=11)
+```
+
+    ## 
+    ## Call:
+    ## svyglm(formula = HIGHBP ~ SMK_12 + CLC_SEX + CLC_AGE + HWMDBMI + 
+    ##     LAB_BCD + LAB_BHG + CLC_SEX:CLC_AGE + CLC_SEX:HWMDBMI + CLC_SEX:LAB_BCD + 
+    ##     CLC_SEX:LAB_BHG, design = dsg, family = "quasibinomial")
+    ## 
+    ## Survey design:
+    ## svydesign(data = df, id = ~1, weights = ~WGT_FULL, variables = df[, 
+    ##     c("SMK_12", "CLC_SEX", "CLC_AGE", "HWMDBMI", "LAB_BCD", "LAB_BHG", 
+    ##         "HIGHBP")])
+    ## 
+    ## Coefficients:
+    ##                      Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)         -3.822851   0.392853  -9.731 9.70e-07 ***
+    ## SMK_12non-smoker     0.001457   0.142377   0.010  0.99202    
+    ## SMK_12occasional    -0.173236   0.282802  -0.613  0.55261    
+    ## CLC_SEXmale          1.401105   0.523751   2.675  0.02160 *  
+    ## CLC_AGE              0.051165   0.004520  11.320 2.11e-07 ***
+    ## HWMDBMI              0.035531   0.009877   3.597  0.00419 ** 
+    ## LAB_BCD              0.008614   0.006619   1.301  0.21975    
+    ## LAB_BHG              0.004657   0.003632   1.282  0.22619    
+    ## CLC_SEXmale:CLC_AGE -0.007122   0.006234  -1.142  0.27753    
+    ## CLC_SEXmale:HWMDBMI -0.022847   0.013933  -1.640  0.12930    
+    ## CLC_SEXmale:LAB_BCD -0.010532   0.009147  -1.151  0.27399    
+    ## CLC_SEXmale:LAB_BHG -0.001740   0.005287  -0.329  0.74822    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for quasibinomial family taken to be 1.007615)
+    ## 
+    ## Number of Fisher Scoring iterations: 4
+
+For this model, the Body mass index shows a lower impact.
+
+Thus, models with the additional with sex factor interactions show
+similar results to the simple models. The interaction coefficients are
+not significant in all models, hence the risk factors are the same for
+both sexes.
+
 # Conclusion
 
 Survey information provides more representative results, because it
@@ -728,5 +837,6 @@ according to the GLM model with survey design information:
 3.  Individuals with high Body mass index.
 
 In addition, it can be concluded that Smoking factor does not affect the
-presence of hypertension. These conclusions correspond to what is shown
-in the *“Visualization”* section.
+presence of hypertension. As was shown in the section 3.2, the risk
+factors are the same for both sexes. These conclusions correspond to
+what is shown in the *“Visualization”* section.

@@ -2,6 +2,7 @@
 ############# Code for the Case Study 1 #############
 #####################################################
 
+
 ## Author: Aleksandr Tsybakin
 ## Date:   28/03/2021
 
@@ -251,3 +252,33 @@ summary(model_2)
 # Get the summary for 11 degrees of freedom
 summary(model_2, df.resid=11)
 
+
+################ 3.2. Exploring sex factor ################
+
+######## 3.1.1. Models without survey information ######### 
+
+# Define a simple model:
+# 1. Set the formula that includes all variables and interactions.
+# 2. Determine the data.
+# 3. Set the binomial distribution, logit link function by default.
+
+model_3 = glm(HIGHBP~SMK_12+CLC_SEX+CLC_AGE+HWMDBMI+LAB_BCD+LAB_BHG+CLC_SEX:CLC_AGE+CLC_SEX:HWMDBMI+CLC_SEX:LAB_BCD+CLC_SEX:LAB_BHG, 
+              data=df,                                                           
+              family="binomial")                                                 
+summary(model_3)
+
+
+########## 3.1.1. Models with survey information ##########
+
+# Define a model with survey design
+# 1. Set the formula that includes all variables and interactions.
+# 2. Determine the design of the survey.
+# 3. Set the 'quasibinomial' distribution as proposed by tutorials to avoid warnings.
+
+model_4 = svyglm(HIGHBP~SMK_12+CLC_SEX+CLC_AGE+HWMDBMI+LAB_BCD+LAB_BHG+CLC_SEX:CLC_AGE+CLC_SEX:HWMDBMI+CLC_SEX:LAB_BCD+CLC_SEX:LAB_BHG, 
+                 design=dsg,
+                 family="quasibinomial")                                             
+summary(model_4)
+
+# Get the summary for 11 degrees of freedom
+summary(model_4, df.resid=11)
