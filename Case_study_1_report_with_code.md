@@ -163,20 +163,20 @@ relations.
 
 *KNN imputer* is based on the well-known *K-Nearest Neighbors*
 classification algorithm. For classification tasks, it assigns the most
-common category among \(K\) nearest neighbors to the current object with
+common category among *K* nearest neighbors to the current object with
 missing value. In terms of regression, the most popular approach is
-assigning an average value of \(K\) nearest neighbors.
+assigning an average value of *K* nearest neighbors.
 
 The error of imputations for continuous variables is evaluated by *Mean
 Absolute Percentage Error* (MAPE):
 
 ![formula](https://render.githubusercontent.com/render/math?math=MAPE%20=%20\\frac%7B1%7D%7BN%7D%20\\sum_%7Bi=1%7D%5EN%7C\\frac%7By_i%20-%20\\hat%7By_i%7D%7D%7By_i%7D%7C)
 
-where N - number of variables,
+where *N* - number of variables,
 ![formula](https://render.githubusercontent.com/render/math?math=y_i) -
 actual value,
 ![formula](https://render.githubusercontent.com/render/math?math=\\hat%7By_i%7D)
-- predicted value.
+predicted value.
 
 ``` r
 MAPE = function(y_pred, y_true) {
@@ -203,7 +203,7 @@ df_check = df[complete.cases(df[, main_vars]), main_vars]
 df_check = df_check[(df_check[, "LAB_BCD"] != 999.5) & (df_check[, "LAB_BHG"] != 999.5),]
 
 # Define the number of simulations
-N_SIM = 1 
+N_SIM = 25
 ```
 
 Then, the imputation of missing values are simulated in 3 steps:
@@ -220,7 +220,107 @@ Then, the imputation of missing values are simulated in 3 steps:
     ##   missForest iteration 3 in progress...done!
     ##   missForest iteration 4 in progress...done!
     ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ## NOTE: In the following pairs of variables, the missingness pattern of the second is a subset of the first.
+    ##  Please verify whether they are in fact logically distinct variables.
+    ##      [,1]      [,2]    
+    ## [1,] "LAB_BCD" "SMK_12"
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
     ##   missForest iteration 6 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ## NOTE: In the following pairs of variables, the missingness pattern of the second is a subset of the first.
+    ##  Please verify whether they are in fact logically distinct variables.
+    ##      [,1]      [,2]    
+    ## [1,] "LAB_BHG" "SMK_12"
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
 
 Once all simulations are done, an average value of the errors among all
 runs are calculated. Due to the limitation of calculations, only 25
@@ -235,9 +335,9 @@ errors_df
 ```
 
     ##              HWMDBMI  LAB_BHG  LAB_BCD SMK_12
-    ## MI         0.3786776 1.967994 1.947163      1
-    ## MissForest 0.2503295 1.842966 2.187218      1
-    ## KNN        0.2843573 1.649950 2.013710      1
+    ## MI         0.2855085 1.698504 2.896493   0.76
+    ## MissForest 0.2236331 1.536648 2.849425   0.92
+    ## KNN        0.2434220 1.484435 2.717064   0.88
 
 The accuracy of predictions is satisfactory only for the *‘HWMDBMI’*
 column. However, all imputation method shows very low precision for the
@@ -255,8 +355,7 @@ df = df[complete.cases(df), ]
 
 As was mentioned before, two columns from the dataset contain values
 below the specified limit. These values are marked with the special
-number \(999.5\). The histogram of below-the-limit values is shown
-below.
+number 999.5. The histogram of below-the-limit values is shown below.
 
 ``` r
 get_below_the_limit_vals = function(col) {
