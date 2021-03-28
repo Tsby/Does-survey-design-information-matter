@@ -172,7 +172,10 @@ Absolute Percentage Error* (MAPE):
 
 ![formula](https://render.githubusercontent.com/render/math?math=MAPE%20=%20\\frac%7B1%7D%7BN%7D%20\\sum_%7Bi=1%7D%5EN%7C\\frac%7By_i%20-%20\\hat%7By_i%7D%7D%7By_i%7D%7C)
 
-where \(N\) - number of variables, \(y_i\) - actual value, \(\hat{y_i}\)
+where N - number of variables,
+![formula](https://render.githubusercontent.com/render/math?math=y_i) -
+actual value,
+![formula](https://render.githubusercontent.com/render/math?math=\\hat%7By_i%7D)
 - predicted value.
 
 ``` r
@@ -216,6 +219,8 @@ Then, the imputation of missing values are simulated in 3 steps:
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
     ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 6 in progress...done!
 
 Once all simulations are done, an average value of the errors among all
 runs are calculated. Due to the limitation of calculations, only 25
@@ -230,9 +235,9 @@ errors_df
 ```
 
     ##              HWMDBMI  LAB_BHG  LAB_BCD SMK_12
-    ## MI         0.2669640 1.239002 1.860906      1
-    ## MissForest 0.2345425 1.215983 2.521929      1
-    ## KNN        0.2510459 1.352139 1.846664      1
+    ## MI         0.3786776 1.967994 1.947163      1
+    ## MissForest 0.2503295 1.842966 2.187218      1
+    ## KNN        0.2843573 1.649950 2.013710      1
 
 The accuracy of predictions is satisfactory only for the *‘HWMDBMI’*
 column. However, all imputation method shows very low precision for the
