@@ -215,6 +215,100 @@ Then, the imputation of missing values are simulated in 3 steps:
 
 <!-- end list -->
 
+``` r
+# Define an Error matrix
+errors = matrix(0, ncol=length(missing_vars), nrow=3)
+
+mi_imputation = function(df_check_mi) {
+    # This function imputes the missing values using Multiple imputations
+    # from the mi package
+    
+    # Define the Missing Data Frame
+    mdf = missing_data.frame(df_check_mi)
+    
+    # Change the method to Predictive Mean Matching
+    mdf = change(mdf, y=missing_vars, what="method", to="pmm")
+    
+    # Impute missing values with  1 chain and 30 iterations
+    imputations = mi(mdf, n.iter=30, n.chains=1, max.minutes=15, verbose=FALSE)
+    
+    # Get the imputed data
+    imputed_df = complete(imputations)
+    imputed_df = imputed_df[, main_vars]
+    return(imputed_df)
+}
+
+for (k in 1:N_SIM) {
+    # Initialize store lists
+    df_check_cur = data.frame(df_check)
+    imputed_dfs = list()
+    inds = list()
+    
+    # Generate missing values
+    inds[[1]] = sample(1:nrow(df_check), sort_nan_cols["HWMDBMI"])
+    inds[[2]] = sample(1:nrow(df_check), sort_nan_cols["LAB_BHG"])
+    inds[[3]] = sample(1:nrow(df_check), sort_nan_cols["LAB_BCD"])
+    inds[[4]] = sample(1:nrow(df_check), sort_nan_cols["SMK_12"])
+    
+    df_check_cur[inds[[1]], "HWMDBMI"] = NA
+    df_check_cur[inds[[2]], "LAB_BHG"] = NA
+    df_check_cur[inds[[3]], "LAB_BCD"] = NA
+    df_check_cur[inds[[4]], "SMK_12"] = NA
+    
+    # Impute missing values using 3 methods
+    imputed_dfs[[1]] = mi_imputation(df_check_cur)
+    imputed_dfs[[2]] = missForest(df_check_cur, maxiter=10, ntree=100, verbose=FALSE)$ximp
+    imputed_dfs[[3]] = kNN(df_check_cur, k=3)
+    
+    # Calculate the errors for each column
+    for (i in 1:3) {
+        for (j in 1:length(missing_vars)) {
+            cur_imp_df = imputed_dfs[[i]]
+            cur_col = missing_vars[j]
+            cur_rows = inds[[j]]
+            
+            if (cur_col == "SMK_12") {
+                # Calculate Accuracy
+                cur_error = (cur_imp_df[cur_rows, cur_col] == df_check[cur_rows, cur_col])
+                errors[i, j] = errors[i, j] + cur_error
+            } else {
+                # Calculate MAPE
+                cur_MAPE = MAPE(cur_imp_df[cur_rows, cur_col], df_check[cur_rows, cur_col])
+                errors[i, j] = errors[i, j] + cur_MAPE
+            }
+        }
+    }
+}
+```
+
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
@@ -227,29 +321,14 @@ Then, the imputation of missing values are simulated in 3 steps:
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
     ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 5 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
@@ -268,38 +347,6 @@ Then, the imputation of missing values are simulated in 3 steps:
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ## NOTE: In the following pairs of variables, the missingness pattern of the second is a subset of the first.
-    ##  Please verify whether they are in fact logically distinct variables.
-    ##      [,1]      [,2]    
-    ## [1,] "LAB_BCD" "SMK_12"
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
-    ##   missForest iteration 1 in progress...done!
-    ##   missForest iteration 2 in progress...done!
-    ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
@@ -309,14 +356,31 @@ Then, the imputation of missing values are simulated in 3 steps:
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
-    ##   missForest iteration 4 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
     ## NOTE: In the following pairs of variables, the missingness pattern of the second is a subset of the first.
     ##  Please verify whether they are in fact logically distinct variables.
     ##      [,1]      [,2]    
+    ## [1,] "HWMDBMI" "SMK_12"
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ## NOTE: In the following pairs of variables, the missingness pattern of the second is a subset of the first.
+    ##  Please verify whether they are in fact logically distinct variables.
+    ##      [,1]      [,2]    
     ## [1,] "LAB_BHG" "SMK_12"
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
+    ##   missForest iteration 4 in progress...done!
+    ##   missForest iteration 1 in progress...done!
+    ##   missForest iteration 2 in progress...done!
+    ##   missForest iteration 3 in progress...done!
     ##   missForest iteration 1 in progress...done!
     ##   missForest iteration 2 in progress...done!
     ##   missForest iteration 3 in progress...done!
@@ -335,9 +399,9 @@ errors_df
 ```
 
     ##              HWMDBMI  LAB_BHG  LAB_BCD SMK_12
-    ## MI         0.2855085 1.698504 2.896493   0.76
-    ## MissForest 0.2236331 1.536648 2.849425   0.92
-    ## KNN        0.2434220 1.484435 2.717064   0.88
+    ## MI         0.2885051 1.899921 3.144823   0.56
+    ## MissForest 0.2134854 1.579369 2.802154   0.80
+    ## KNN        0.2390677 1.549079 2.897043   0.72
 
 The accuracy of predictions is satisfactory only for the *‘HWMDBMI’*
 column. However, all imputation method shows very low precision for the
